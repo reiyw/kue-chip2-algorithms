@@ -1,0 +1,52 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Generate pseudo-random numbers using linear feedback shift register
+* Programmed by Ryo Takahashi, April. 28, 2014
+
+* Initial value of ACC
+ 80 :           INIT:    EQU          80H
+
+ 00 :   74 80            ST    ACC,   [INIT]
+ 02 :   68      LOOP:    LD    IX,    ACC
+ 03 :   4A               SRL   IX
+ 04 :   3D 12            BC           S1
+ 06 :   4A               SRL   IX
+ 07 :   4A               SRL   IX
+ 08 :   3D 1E            BC           S10
+ 0A :   4A               SRL   IX
+ 0B :   3D 2E            BC           OD
+ 0D :   4A               SRL   IX
+ 0E :   3D 38            BC           ODD
+ 10 :   30 3B            BA           EVEN
+ 12 :   4A      S1:      SRL   IX
+ 13 :   4A               SRL   IX
+ 14 :   3D 26            BC           S11
+ 16 :   4A               SRL   IX
+ 17 :   3D 33            BC           EV
+ 19 :   4A               SRL   IX
+ 1A :   3D 3B            BC           EVEN
+ 1C :   30 38            BA           ODD
+ 1E :   4A      S10:     SRL   IX
+ 1F :   3D 33            BC           EV
+ 21 :   4A               SRL   IX
+ 22 :   3D 3B            BC           EVEN
+ 24 :   30 38            BA           ODD
+ 26 :   4A      S11:     SRL   IX
+ 27 :   3D 2E            BC           OD
+ 29 :   4A               SRL   IX
+ 2A :   3D 38            BC           ODD
+ 2C :   30 3B            BA           EVEN
+ 2E :   4A      OD:      SRL   IX
+ 2F :   3D 3B            BC           EVEN
+ 31 :   30 38            BA           ODD
+ 33 :   4A      EV:      SRL   IX
+ 34 :   3D 38            BC           ODD
+ 36 :   30 3B            BA           EVEN
+ 38 :   2F      ODD:     SCF
+ 39 :   30 3C            BA           SKIP
+ 3B :   20      EVEN:    RCF
+ 3C :   44      SKIP:    RRA   ACC
+ 3D :   F4 80            CMP   ACC,   [INIT]
+ 3F :   31 02            BNZ          LOOP
+ 41 :   0F               HLT
+                         END

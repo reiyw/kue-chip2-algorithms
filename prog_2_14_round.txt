@@ -1,0 +1,110 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Multiply Floating-point Numbers and Round Half to Even ((1+1+14)bytes*(1+1+14)bytes=(1+1+14)bytes)
+* Programmed by Ryo Takahashi, June 2, 2014
+
+* Storage for Multiplier (Given)
+ 00 :                   DATA1:  EQU             100H
+* Storage for Multiplicand (Given)
+ 10 :                   DATA2:  EQU             110H
+* Storage for Partial Product (Work Area)
+ D0 :                   WORK:   EQU             1D0H
+* Storage for Loop Counter (Work Area)
+ F0 :                   COUNT:  EQU             1F0H
+* Storage for Product (Answer)
+ 20 :                   ANS:    EQU             120H
+
+ 00 :   65 01                   LD      ACC,    (DATA1+1)
+ 02 :   B5 11                   ADD     ACC,    (DATA2+1)
+ 04 :   A2 7F                   SUB     ACC,    7FH
+ 06 :   75 21                   ST      ACC,    (ANS+1)
+ 08 :   62 70                   LD      ACC,    112
+ 0A :   75 F0                   ST      ACC,    (COUNT)
+ 0C :   6A 0E                   LD      IX,     14
+ 0E :   C0              LP1:    EOR     ACC,    ACC
+ 0F :   77 CF                   ST      ACC,    (IX+WORK-1)
+ 11 :   77 21                   ST      ACC,    (IX+ANS+2-1)
+ 13 :   77 2F                   ST      ACC,    (IX+ANS+2+14-1)
+ 15 :   67 11                   LD      ACC,    (IX+DATA2+2-1)
+ 17 :   77 DD                   ST      ACC,    (IX+WORK+14-1)
+ 19 :   AA 01                   SUB     IX,     1
+ 1B :   31 0E                   BNZ             LP1
+ 1D :   65 0F           LP2:    LD      ACC,    (DATA1+2+13)
+ 1F :   42                      SRL     ACC
+ 20 :   6A F2                   LD      IX,     -14
+ 22 :   67 10           LP3:    LD      ACC,    (IX+DATA1+2+14)
+ 24 :   44                      RRA     ACC
+ 25 :   77 10                   ST      ACC,    (IX+DATA1+2+14)
+ 27 :   BA 01                   ADD     IX,     1
+ 29 :   31 22                   BNZ             LP3
+ 2B :   35 3A                   BNC             LP5
+ 2D :   6A 1C                   LD      IX,     28
+ 2F :   20                      RCF
+ 30 :   67 21           LP4:    LD      ACC,    (IX+ANS+2-1)
+ 32 :   97 CF                   ADC     ACC,    (IX+WORK-1)
+ 34 :   77 21                   ST      ACC,    (IX+ANS+2-1)
+ 36 :   AA 01                   SUB     IX,     1
+ 38 :   31 30                   BNZ             LP4
+ 3A :   6A 1C           LP5:    LD      IX,     28
+ 3C :   20                      RCF
+ 3D :   67 CF           LP6:    LD      ACC,    (IX+WORK-1)
+ 3F :   45                      RLA     ACC
+ 40 :   77 CF                   ST      ACC,    (IX+WORK-1)
+ 42 :   AA 01                   SUB     IX,     1
+ 44 :   31 3D                   BNZ             LP6
+ 46 :   65 F0                   LD      ACC,    (COUNT)
+ 48 :   A2 01                   SUB     ACC,    1
+ 4A :   75 F0                   ST      ACC,    (COUNT)
+ 4C :   31 1D                   BNZ             LP2
+ 4E :   65 22                   LD      ACC,    (ANS+2)
+ 50 :   E2 80                   AND     ACC,    80H
+ 52 :   31 66                   BNZ             LP8
+ 54 :   65 3D                   LD      ACC,    (ANS+2+27)
+ 56 :   43                      SLL     ACC
+ 57 :   75 3D                   ST      ACC,    (ANS+2+27)
+ 59 :   6A 1B                   LD      IX,     27
+ 5B :   67 21           LP7:    LD      ACC,    (IX+ANS+2-1)
+ 5D :   45                      RLA     ACC
+ 5E :   77 21                   ST      ACC,    (IX+ANS+2-1)
+ 60 :   AA 01                   SUB     IX,     1
+ 62 :   31 5B                   BNZ             LP7
+ 64 :   30 6C                   BA              SP1
+ 66 :   65 21           LP8:    LD      ACC,    (ANS+1)
+ 68 :   B2 01                   ADD     ACC,    1
+ 6A :   75 21                   ST      ACC,    (ANS+1)
+ 6C :   65 30           SP1:    LD      ACC,    (ANS+2+14)
+ 6E :   43                      SLL     ACC
+ 6F :   35 A7                   BNC             SP2
+ 71 :   F2 00                   CMP     ACC,    0
+ 73 :   31 86                   BNZ             SP3
+ 75 :   6A 0D                   LD      IX,     13
+ 77 :   67 30           LP9:    LD      ACC,    (IX+ANS+2+14)
+ 79 :   F2 00                   CMP     ACC,    0
+ 7B :   31 86                   BNZ             SP3
+ 7D :   AA 01                   SUB     IX,     1
+ 7F :   31 77                   BNZ             LP9
+ 81 :   65 2F                   LD      ACC,    (ANS+2+13)
+ 83 :   42                      SRL     ACC
+ 84 :   35 A7                   BNC             SP2
+ 86 :   20              SP3:    RCF
+ 87 :   65 2F                   LD      ACC,    (ANS+2+13)
+ 89 :   92 01                   ADC     ACC,    1
+ 8B :   75 2F                   ST      ACC,    (ANS+2+13)
+ 8D :   35 A7                   BNC             SP2
+ 8F :   6A 0C                   LD      IX,     12
+ 91 :   67 22           LP10:   LD      ACC,    (IX+ANS+2)
+ 93 :   92 00                   ADC     ACC,    0
+ 95 :   77 22                   ST      ACC,    (IX+ANS+2)
+ 97 :   35 A7                   BNC             SP2
+ 99 :   AA 01                   SUB     IX,     1
+ 9B :   32 91                   BZP             LP10
+ 9D :   B2 80                   ADD     ACC,    80H
+ 9F :   75 22                   ST      ACC,    (ANS+2)
+ A1 :   65 21                   LD      ACC,    (ANS+1)
+ A3 :   B2 01                   ADD     ACC,    1
+ A5 :   75 21                   ST      ACC,    (ANS+1)
+ A7 :   65 00           SP2:    LD      ACC,    (DATA1)
+ A9 :   C5 10                   EOR     ACC,    (DATA2)
+ AB :   75 20                   ST      ACC,    (ANS)
+ AD :   0F                      HLT
+                                END

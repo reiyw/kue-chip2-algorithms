@@ -1,0 +1,52 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Find all the prime numbers less than or equal to 20 using Sieve of Eratosthenes
+* Programmed by Ryo Takahashi, April. 28, 2014
+* Last modified: May 9, 2014
+
+* A list of consecutive integers from 2 through 20
+ 80 :           LIST:    EQU          80H
+* A list of prime numbers form 2 to 20
+ A0 :           PRIME:   EQU          A0H
+* Work Area
+ F0 :           WORK1:   EQU          F0H
+* Work Area
+ F1 :           WORK2:   EQU          F1H
+
+ 00 :   62 14            LD    ACC,   20
+ 02 :   6A 02            LD    IX,    2
+ 04 :   7E 7E   LP1:     ST    IX,    [IX+LIST-2] ; [80H]-[92H]に2-20の整数リストを入れる．
+ 06 :   BA 01            ADD   IX,    1
+ 08 :   F1               CMP   ACC,   IX
+ 09 :   32 04            BZP          LP1
+ 0B :   6A 02            LD    IX,    2
+ 0D :   FE 7E   LP2:     CMP   IX,    [IX+LIST-2]
+ 0F :   31 1F            BNZ          SP1         ; IX != [IX+LIST-2] ならば[IX+LIST-2]には0が入っている．
+ 11 :   7C F0            ST    IX,    [WORK1]
+ 13 :   4B               SLL   IX
+ 14 :   C0               EOR   ACC,   ACC
+ 15 :   76 7E   LP3:     ST    ACC,   [IX+LIST-2] ; 素数以外は0にする．
+ 17 :   BC F0            ADD   IX,    [WORK1]
+ 19 :   FA 14            CMP   IX,    20
+ 1B :   3B 15            BZN          LP3
+ 1D :   6C F0            LD    IX,    [WORK1]
+ 1F :   BA 01   SP1:     ADD   IX,    1
+ 21 :   FA 05            CMP   IX,    5
+ 23 :   31 0D            BNZ          LP2         ; √20 ~ 4.5 に達するまで篩い落とし操作を行う．
+ 25 :   C9               EOR   IX,    IX
+ 26 :   7C F1            ST    IX,    [WORK2]
+ 28 :   6A 02            LD    IX,    2
+ 2A :   FE 7E   LP4:     CMP   IX,    [IX+LIST-2]
+ 2C :   31 3B            BNZ          SP2         ; [IX+LIST-2]の内容が0でなければその値は素数．
+ 2E :   7C F0            ST    IX,    [WORK1]
+ 30 :   61               LD    ACC,   IX
+ 31 :   6C F1            LD    IX,    [WORK2]
+ 33 :   76 A0            ST    ACC,   [IX+PRIME]
+ 35 :   BA 01            ADD   IX,    1
+ 37 :   7C F1            ST    IX,    [WORK2]
+ 39 :   6C F0            LD    IX,    [WORK1]
+ 3B :   BA 01   SP2:     ADD   IX,    1
+ 3D :   FA 14            CMP   IX,    20
+ 3F :   3B 2A            BZN   IX,    LP4
+ 41 :   0F               HLT
+                         END

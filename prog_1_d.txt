@@ -1,0 +1,43 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Calculate least common multiple using Euclidean algorithm
+* Programmed by Ryo Takahashi, May 28, 2014
+
+* A (0 < A < 128)
+ 80 :           A:      EQU          80H
+* B (0 < B < 128)
+ 81 :           B:      EQU          81H
+* GCD
+ 82 :           G:      EQU          82H
+* LCM (Result)
+ 83 :           L:      EQU          83H
+
+ 00 :   64 80           LD    ACC,   [A]
+ 02 :   6C 81           LD    IX,    [B]
+ 04 :   A1      LP1:    SUB   ACC,   IX    ; GCD の計算．結果は [G] に格納される．
+ 05 :   32 04           BZP          LP1
+ 07 :   B1              ADD   ACC,   IX
+ 08 :   C8              EOR   IX,    ACC
+ 09 :   C1              EOR   ACC,   IX
+ 0A :   C8              EOR   IX,    ACC
+ 0B :   31 04           BNZ          LP1
+ 0D :   74 82           ST    ACC,   [G]
+ 0F :   C0              EOR   ACC,   ACC
+ 10 :   74 83           ST    ACC,   [L]
+ 12 :   74 84           ST    ACC,   [L+1]
+ 14 :   B4 82   LP2:    ADD   ACC,   [G]   ; B / G の計算．結果は IX に代入されている．
+ 16 :   BA 01           ADD   IX,    1
+ 18 :   F4 81           CMP   ACC,   [B]
+ 1A :   31 14           BNZ          LP2
+ 1C :   20      LP3:    RCF                ; A * IX の計算．
+ 1D :   64 80           LD    ACC,   [A]
+ 1F :   94 84           ADC   ACC,   [L+1]
+ 21 :   74 84           ST    ACC,   [L+1]
+ 23 :   35 2B           BNC          SKIP
+ 25 :   64 83           LD    ACC,   [L]
+ 27 :   B2 01           ADD   ACC,   1
+ 29 :   74 83           ST    ACC,   [L]
+ 2B :   AA 01   SKIP:   SUB   IX,    1
+ 2D :   31 1C           BNZ          LP3
+ 2F :   0F              HLT
+                        END

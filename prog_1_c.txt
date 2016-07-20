@@ -1,0 +1,56 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Calculate least common multiple using Euclidean algorithm
+* Programmed by Ryo Takahashi, May 28, 2014
+
+* A (0 < A < 128)
+ 80 :           A:      EQU          80H
+* B (0 < B < 128)
+ 81 :           B:      EQU          81H
+* GCD
+ 82 :           G:      EQU          82H
+* LCM (Result)
+ 83 :           L:      EQU          85H
+* Work Area
+ F0 :           WORK:   EQU          F0H
+
+ 00 :   64 80           LD    ACC,   [A]
+ 02 :   6C 81           LD    IX,    [B]
+ 04 :   A1      LP1:    SUB   ACC,   IX       ; GCD の計算．結果は [G] に格納される．
+ 05 :   32 04           BZP          LP1
+ 07 :   B1              ADD   ACC,   IX
+ 08 :   C8              EOR   IX,    ACC
+ 09 :   C1              EOR   ACC,   IX
+ 0A :   C8              EOR   IX,    ACC
+ 0B :   31 04           BNZ          LP1
+ 0D :   74 82           ST    ACC,   [G]
+ 0F :   C0              EOR   ACC,   ACC
+ 10 :   74 83           ST    ACC,   [L]
+ 12 :   74 84           ST    ACC,   [L+1]
+ 14 :   74 F0           ST    ACC,   [WORK]
+ 16 :   B4 82   LP2:    ADD   ACC,   [G]      ; B / G の計算．結果は IX に代入されている．
+ 18 :   BA 01           ADD   IX,    1
+ 1A :   F4 81           CMP   ACC,   [B]
+ 1C :   31 16           BNZ          LP2
+ 1E :   7C F1           ST    IX,    [WORK+1] ; ここから A * IX の計算．
+ 20 :   6C 80           LD    IX,    [A]
+ 22 :   4A      LP3:    SRL   IX
+ 23 :   35 32           BNC          SP1
+ 25 :   20              RCF
+ 26 :   64 84           LD    ACC,   [L+1]
+ 28 :   94 F1           ADC   ACC,   [WORK+1]
+ 2A :   74 84           ST    ACC,   [L+1]
+ 2C :   64 83           LD    ACC,   [L]
+ 2E :   94 F0           ADC   ACC,   [WORK]
+ 30 :   74 83           ST    ACC,   [L]
+ 32 :   FA 00   SP1:    CMP   IX,    0
+ 34 :   39 42           BZ           FIN
+ 36 :   64 F1           LD    ACC,   [WORK+1]
+ 38 :   41              SLA   ACC
+ 39 :   74 F1           ST    ACC,   [WORK+1]
+ 3B :   64 F0           LD    ACC,   [WORK]
+ 3D :   45              RLA   ACC
+ 3E :   74 F0           ST    ACC,   [WORK]
+ 40 :   30 22           BA           LP3
+ 42 :   0F      FIN:    HLT
+                        END

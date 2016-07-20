@@ -1,0 +1,77 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Calculate least common multiple using Euclidean algorithm
+* Programmed by Ryo Takahashi, June 2, 2014
+
+* A (0 < A < 128)
+ 80 :                   A:      EQU             80H
+* B (0 < B < 128)
+ 81 :                   B:      EQU             81H
+* GCD
+ 82 :                   G:      EQU             82H
+* Product
+ 83 :                   ANS:    EQU             83H
+* LCM (Result)
+ 85 :                   L:      EQU             85H
+
+ 00 :   64 80                   LD      ACC,    [A]
+ 02 :   6C 81                   LD      IX,     [B]
+ 04 :   A1              LP1:    SUB     ACC,    IX
+ 05 :   32 04                   BZP             LP1
+ 07 :   B1                      ADD     ACC,    IX
+ 08 :   C8                      EOR     IX,     ACC
+ 09 :   C1                      EOR     ACC,    IX
+ 0A :   C8                      EOR     IX,     ACC
+ 0B :   31 04                   BNZ             LP1
+ 0D :   74 82                   ST      ACC,    [G]
+ 0F :   C0                      EOR     ACC,    ACC
+ 10 :   74 83                   ST      ACC,    [ANS]
+ 12 :   74 84                   ST      ACC,    [ANS+1]
+ 14 :   74 85                   ST      ACC,    [L]
+ 16 :   74 86                   ST      ACC,    [L+1]
+ 18 :   6C 81                   LD      IX,     [B]
+ 1A :   20              LP2:    RCF
+ 1B :   64 80                   LD      ACC,    [A]
+ 1D :   94 84                   ADC     ACC,    [ANS+1]
+ 1F :   74 84                   ST      ACC,    [ANS+1]
+ 21 :   35 29                   BNC             SP1
+ 23 :   64 83                   LD      ACC,    [ANS]
+ 25 :   B2 01                   ADD     ACC,    1
+ 27 :   74 83                   ST      ACC,    [ANS]
+ 29 :   AA 01           SP1:    SUB     IX,     1
+ 2B :   31 1A                   BNZ             LP2
+ 2D :   64 83                   LD      ACC,    [ANS]
+ 2F :   F2 00                   CMP     ACC,    0
+ 31 :   39 53                   BZ              SP3
+ 33 :   20              LP3:    RCF
+ 34 :   64 84                   LD      ACC,    [ANS+1]
+ 36 :   9A 01           LP4:    ADC     IX,     1
+ 38 :   35 45                   BNC             SP2
+ 3A :   74 84                   ST      ACC,    [ANS+1]
+ 3C :   64 85                   LD      ACC,    [L]
+ 3E :   B2 01                   ADD     ACC,    1
+ 40 :   74 85                   ST      ACC,    [L]
+ 42 :   20                      RCF
+ 43 :   64 84                   LD      ACC,    [ANS+1]
+ 45 :   84 82           SP2:    SBC     ACC,    [G]
+ 47 :   35 36                   BNC             LP4
+ 49 :   74 84                   ST      ACC,    [ANS+1]
+ 4B :   64 83                   LD      ACC,    [ANS]
+ 4D :   A2 01                   SUB     ACC,    1
+ 4F :   74 83                   ST      ACC,    [ANS]
+ 51 :   31 33                   BNZ             LP3
+ 53 :   20              SP3:    RCF
+ 54 :   64 84                   LD      ACC,    [ANS+1]
+ 56 :   9A 01           LP5:    ADC     IX,     1
+ 58 :   35 65                   BNC             SP4
+ 5A :   74 84                   ST      ACC,    [ANS+1]
+ 5C :   64 85                   LD      ACC,    [L]
+ 5E :   B2 01                   ADD     ACC,    1
+ 60 :   74 85                   ST      ACC,    [L]
+ 62 :   20                      RCF
+ 63 :   64 84                   LD      ACC,    [ANS+1]
+ 65 :   84 82           SP4:    SBC     ACC,    [G]
+ 67 :   31 56                   BNZ             LP5
+ 69 :   7C 86                   ST      IX,     [L+1]
+ 6B :   0F                      HLT
+                                END

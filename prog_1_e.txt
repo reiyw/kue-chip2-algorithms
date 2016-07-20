@@ -1,0 +1,76 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Calculate least common multiple sequentially
+* Programmed by Ryo Takahashi, May 29, 2014
+
+* A (0 < A <= 255)
+ 80 :           A:      EQU          80H
+* B (0 < B <= 255)
+ 81 :           B:      EQU          81H
+* LCM (Result)
+ 82 :           L:      EQU          82H
+* Work Area
+ F0 :           WORK:   EQU          F0H
+
+ 00 :   C0              EOR   ACC,   ACC
+ 01 :   74 82           ST    ACC,   [L]
+ 03 :   64 80           LD    ACC,   [A]
+ 05 :   6C 81           LD    IX,    [B]
+ 07 :   20      LP1:    RCF
+ 08 :   45              RLA   ACC
+ 09 :   3D 11           BC           SP1    ; ACC負
+ 0B :   44              RRA   ACC
+ 0C :   4D              RLA   IX
+ 0D :   3D 19           BC           SP2
+ 0F :   30 1D           BA           SP3    ; ACC正，IX正
+ 11 :   44      SP1:    RRA   ACC
+ 12 :   4D              RLA   IX
+ 13 :   3D 1D           BC           SP3    ; ACC負，IX負
+ 15 :   4C              RRA   IX
+ 16 :   20              RCF
+ 17 :   30 24           BA           SP4    ; ACC負，IX正
+ 19 :   4C      SP2:    RRA   IX
+ 1A :   20              RCF
+ 1B :   30 28           BA           SP5    ; ACC正，IX負
+ 1D :   4C      SP3:    RRA   IX
+ 1E :   20              RCF
+ 1F :   F1              CMP   ACC,   IX
+ 20 :   3A 28           BN           SP5
+ 22 :   39 5B           BZ           FIN
+ 24 :   9C 81   SP4:    ADC   IX,    [B]    ; ACC > IX
+ 26 :   30 2A           BA           SP6
+ 28 :   94 80   SP5:    ADC   ACC,   [A]    ; ACC < IX
+ 2A :   35 07   SP6:    BNC          LP1
+ 2C :   20      LP2:    RCF
+ 2D :   45              RLA   ACC
+ 2E :   3D 36           BC           SP7    ; ACC負
+ 30 :   44              RRA   ACC
+ 31 :   4D              RLA   IX
+ 32 :   3D 3E           BC           SP8
+ 34 :   30 42           BA           SP9    ; ACC正，IX正
+ 36 :   44      SP7:    RRA   ACC
+ 37 :   4D              RLA   IX
+ 38 :   3D 42           BC           SP9    ; ACC負，IX負
+ 3A :   4C              RRA   IX
+ 3B :   20              RCF
+ 3C :   30 4B           BA           SP10   ; ACC負，IX正
+ 3E :   4C      SP8:    RRA   IX
+ 3F :   20              RCF
+ 40 :   30 47           BA           SP11   ; ACC正，IX負
+ 42 :   4C      SP9:    RRA   IX
+ 43 :   20              RCF
+ 44 :   F8              CMP   IX,    ACC
+ 45 :   3A 4B           BN           SP10
+ 47 :   9C 81   SP11:   ADC   IX,    [B]    ; ACC < IX
+ 49 :   30 4D           BA           SP12
+ 4B :   94 80   SP10:   ADC   ACC,   [A]    ; ACC > IX
+ 4D :   35 2C   SP12:   BNC          LP2
+ 4F :   74 F0           ST    ACC,   [WORK]
+ 51 :   64 82           LD    ACC,   [L]
+ 53 :   B2 01           ADD   ACC,   1
+ 55 :   74 82           ST    ACC,   [L]
+ 57 :   64 F0           LD    ACC,   [WORK]
+ 59 :   30 07           BA           LP1
+ 5B :   74 83   FIN:    ST    ACC,   [L+1]
+ 5D :   0F              HLT
+                        END

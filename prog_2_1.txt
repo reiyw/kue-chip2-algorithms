@@ -1,0 +1,60 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Multiplication of Floating-point Numbers ((1+1+1)bytes*(1+1+1)bytes=(1+1+1)bytes)
+* Programmed by Ryo Takahashi, June 1, 2014
+
+* Storage for Multiplier (Given)
+ 80 :                   DATA1:  EQU             80H
+* Storage for Multiplicand (Given)
+ 83 :                   DATA2:  EQU             83H
+* Storage for Partial Product (Work Area)
+ F0 :                   WORK:   EQU             0F0H
+* Storage for Product (Answer)
+ 90 :                   ANS:    EQU             90H
+
+ 00 :   64 81                   LD      ACC,    [DATA1+1]
+ 02 :   B4 84                   ADD     ACC,    [DATA2+1]
+ 04 :   A2 7F                   SUB     ACC,    7FH
+ 06 :   74 91                   ST      ACC,    [ANS+1]
+ 08 :   C0                      EOR     ACC,    ACC
+ 09 :   74 92                   ST      ACC,    [ANS+2]
+ 0B :   74 93                   ST      ACC,    [ANS+2+1]
+ 0D :   74 F0                   ST      ACC,    [WORK]
+ 0F :   64 85                   LD      ACC,    [DATA2+2]
+ 11 :   74 F1                   ST      ACC,    [WORK+1]
+ 13 :   6C 82                   LD      IX,     [DATA1+2]
+ 15 :   4A              LP1:    SRL     IX
+ 16 :   35 25                   BNC             SP1
+ 18 :   20                      RCF
+ 19 :   64 93                   LD      ACC,    [ANS+2+1]
+ 1B :   94 F1                   ADC     ACC,    [WORK+1]
+ 1D :   74 93                   ST      ACC,    [ANS+2+1]
+ 1F :   64 92                   LD      ACC,    [ANS+2]
+ 21 :   94 F0                   ADC     ACC,    [WORK]
+ 23 :   74 92                   ST      ACC,    [ANS+2]
+ 25 :   FA 00           SP1:    CMP     IX,     0
+ 27 :   39 35                   BZ              SP2
+ 29 :   64 F1                   LD      ACC,    [WORK+1]
+ 2B :   41                      SLA     ACC
+ 2C :   74 F1                   ST      ACC,    [WORK+1]
+ 2E :   64 F0                   LD      ACC,    [WORK]
+ 30 :   45                      RLA     ACC
+ 31 :   74 F0                   ST      ACC,    [WORK]
+ 33 :   30 15                   BA              LP1
+ 35 :   64 92           SP2:    LD      ACC,    [ANS+2]
+ 37 :   E2 80                   AND     ACC,    80H
+ 39 :   31 45                   BNZ             SP3
+ 3B :   64 93                   LD      ACC,    [ANS+2+1]
+ 3D :   43                      SLL     ACC
+ 3E :   64 92                   LD      ACC,    [ANS+2]
+ 40 :   45                      RLA     ACC
+ 41 :   74 92                   ST      ACC,    [ANS+2]
+ 43 :   30 4B                   BA              SP4
+ 45 :   64 91           SP3:    LD      ACC,    [ANS+1]
+ 47 :   B2 01                   ADD     ACC,    1
+ 49 :   74 91                   ST      ACC,    [ANS+1]
+ 4B :   64 80           SP4:    LD      ACC,    [DATA1]
+ 4D :   C4 83                   EOR     ACC,    [DATA2]
+ 4F :   74 90                   ST      ACC,    [ANS]
+ 51 :   0F                      HLT
+                                END

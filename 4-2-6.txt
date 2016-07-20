@@ -1,0 +1,38 @@
+*** KUE-CHIP2 Assembler ver.1.0   by H.Ochi ***
+
+* Binary search algorithm
+* Programmed by Ryo Takahashi, April. 29, 2014
+
+* The list to be searched (Given)
+ 100 :          LIST:    EQU          100H
+* The value to be found (Given)
+ 80 :           VAL:     EQU          80H
+* Searching range (Given) (0 <= LEFT <= RIGHT <= 7FH)
+ 81 :           LEFT:    EQU          81H
+ 82 :           RIGHT:   EQU          82H
+* The index of finding value
+ 83 :           RESULT:  EQU          83H
+
+
+ 00 :   6C 81   LP1:     LD    IX,    [LEFT]
+ 02 :   BC 82   LP2:     ADD   IX,    [RIGHT]
+ 04 :   4A               SRL   IX
+ 05 :   67 00            LD    ACC,   (IX+LIST)
+ 07 :   F4 80            CMP   ACC,   [VAL]
+ 09 :   33 11            BP           SP1
+ 0B :   3A 1B            BN           SP2
+ 0D :   7C 83            ST    IX,    [RESULT]
+ 0F :   30 27            BA           FIN
+ 11 :   AA 01   SP1:     SUB   IX,    1
+ 13 :   7C 82            ST    IX,    [RIGHT]
+ 15 :   FC 81            CMP   IX,    [LEFT]
+ 17 :   32 00            BZP          LP1
+ 19 :   30 23            BA           NFD
+ 1B :   BA 01   SP2:     ADD   IX,    1
+ 1D :   7C 81            ST    IX,    [LEFT]
+ 1F :   FC 82            CMP   IX,    [RIGHT]
+ 21 :   3B 02            BZN          LP2
+ 23 :   62 FF   NFD:     LD    ACC,   FFH
+ 25 :   74 83            ST    ACC,   [RESULT]
+ 27 :   0F      FIN      HLT
+                         END
